@@ -4,7 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // SEARCH BAR FUNCTIONALITY
     const searchInput = document.getElementById("searchInput");
     const suggestionsBox = document.getElementById("suggestions");
-    const searchFilter = document.getElementById("searchFilter");
+    const searchFilter = { value: "all" };
+
     // Restore state when returning from artist details
 const savedOffset = parseInt(sessionStorage.getItem("offset")) || 10;
 let restoreOffset = savedOffset;
@@ -70,7 +71,7 @@ if (restoreOffset > 10) {
 
                     data.forEach((result) => {
                         const li = document.createElement("li");
-                        li.textContent = `${result.Value} — ${result.Type}`;
+                        li.textContent = result.Value;
                         li.className = "suggestion-item";
                         li.onclick = () => {
                             window.location.href = `/artist/${result.Artist.replace(/\s+/g, "-")}`;

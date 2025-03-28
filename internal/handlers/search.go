@@ -13,59 +13,97 @@ type SearchResult struct {
 	Value  string `json:"Value"`
 	Type   string `json:"Type"`
 	Artist string `json:"Artist"`
+	ID     int    `json:"ID"`
 }
 
 func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	query := strings.ToLower(r.URL.Query().Get("query"))
-	filter := r.URL.Query().Get("filter") // all, artist, member, etc.
-
 	if query == "" {
 		json.NewEncoder(w).Encode([]SearchResult{})
 		return
 	}
 
 	var results []SearchResult
+	seen := make(map[string]bool)
 
 	for _, a := range data.AllArtists {
-		switch filter {
-		case "artist", "all":
-			if strings.Contains(strings.ToLower(a.Name), query) {
-				results = append(results, SearchResult{Value: a.Name, Type: "Artist", Artist: a.Name})
+		// Artist/Band Name
+		if strings.Contains(strings.ToLower(a.Name), query) {
+			key := a.Name + "_artist"
+			if !seen[key] {
+				results = append(results, SearchResult{
+					Value:  a.Name + " — artist/band",
+					Type:   "artist/band",
+					Artist: a.Name,
+					ID:     a.ID,
+				})
+				seen[key] = true
 			}
 		}
-		switch filter {
-		case "member", "all":
-			for _, m := range a.Members {
-				if strings.Contains(strings.ToLower(m), query) {
-					results = append(results, SearchResult{Value: m, Type: "Member", Artist: a.Name})
-				}
-			}
-		}
-		switch filter {
-		case "location", "all":
-			for _, loc := range data.AllLocations.Index {
-				if loc.ID == a.ID {
-					for _, l := range loc.Locations {
-						if strings.Contains(strings.ToLower(l), query) {
-							results = append(results, SearchResult{Value: l, Type: "Location", Artist: a.Name})
-						}
-					}
-					break
+
+		// Members
+		for _, m := range a.Members {
+			if strings.Contains(strings.ToLower(m), query) {
+				key := m + "_member"
+				if !seen[key] {
+					results = append(results, SearchResult{
+						Value:  m + " — member",
+						Type:   "member",
+						Artist: a.Name,
+						ID:     a.ID,
+					})
+					seen[key] = true
 				}
 			}
 		}
 
-		switch filter {
-		case "album", "all":
-			if strings.Contains(strings.ToLower(a.FirstAlbum), query) {
-				results = append(results, SearchResult{Value: a.FirstAlbum, Type: "First Album", Artist: a.Name})
+		// First Album Date
+		if strings.Contains(strings.ToLower(a.FirstAlbum), query) {
+			key := a.FirstAlbum + "_firstalbum"
+			if !seen[key] {
+				results = append(results, SearchResult{
+					Value:  a.FirstAlbum + " — first album date",
+					Type:   "first album date",
+					Artist: a.Name,
+					ID:     a.ID,
+				})
+				seen[key] = true
 			}
 		}
-		switch filter {
-		case "date", "all":
-			year := strconv.Itoa(a.CreationDate)
-			if strings.Contains(year, query) {
-				results = append(results, SearchResult{Value: year, Type: "Creation Date", Artist: a.Name})
+
+		// Creation Date
+		creationStr := strconv.Itoa(a.CreationDate)
+		if strings.Contains(creationStr, query) {
+			key := creationStr + "_creation"
+			if !seen[key] {
+				results = append(results, SearchResult{
+					Value:  creationStr + " — creation date",
+					Type:   "creation date",
+					Artist: a.Name,
+					ID:     a.ID,
+				})
+				seen[key] = true
+			}
+		}
+
+		// Location (using RelationIndex)
+		for _, rel := range data.AllRelations.Index {
+			if rel.ID == a.ID {
+				for location := range rel.DatesLocations {
+					if strings.Contains(strings.ToLower(location), query) {
+						key := location + "_location"
+						if !seen[key] {
+							results = append(results, SearchResult{
+								Value:  location + " — location",
+								Type:   "location",
+								Artist: a.Name,
+								ID:     a.ID,
+							})
+							seen[key] = true
+						}
+					}
+				}
+				break
 			}
 		}
 	}
