@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"groupie-tracker/internal/data"
-	"groupie-tracker/internal/routes"
-	"groupie-tracker/internal/utils"
+	"groupie-tracker-search-bar/internal/data"
+	"groupie-tracker-search-bar/internal/routes"
+	"groupie-tracker-search-bar/internal/utils"
 )
 
 func main() {

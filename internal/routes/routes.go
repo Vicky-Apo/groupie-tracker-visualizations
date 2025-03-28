@@ -4,7 +4,7 @@ import (
 	"html/template"
 	"net/http"
 
-	"groupie-tracker/internal/handlers"
+	"groupie-tracker-search-bar/internal/handlers"
 )
 
 // NewRouter sets up the mux with all the necessary routes.
@@ -22,17 +22,17 @@ func NewRouter(tpl *template.Template) *http.ServeMux {
 	// API Route for fetching artists
 	mux.HandleFunc("/api/artists", handlers.GetArtists)
 
+	//Search handler
+	mux.HandleFunc("/search", handlers.SearchHandler)
+
 	// About page section
 	mux.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
 		tpl.ExecuteTemplate(w, "about.html", nil)
-	})
 
-	// Trigger event route.
-	mux.HandleFunc("/trigger-event", handlers.TriggerEventHandler)
+	})
 
 	// Serve static files.
 	fs := http.FileServer(http.Dir("static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
-
 	return mux
 }

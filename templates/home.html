@@ -16,6 +16,20 @@
   </header>
   
   <main>
+    <div class="search-bar-container">
+      <div class="search-select-wrapper">
+        <select id="searchFilter">
+          <option value="all">All</option>
+          <option value="artist">Artist</option>
+          <option value="member">Member</option>
+          <option value="location">Location</option>
+          <option value="album">First Album</option>
+          <option value="date">Creation Date</option>
+        </select>
+        <input type="text" id="searchInput" placeholder="Search..." autocomplete="on">
+      </div>
+      <ul id="suggestions" class="suggestion-box"></ul>
+    </div>      
     <div class="artist-container" id="artistList">
       {{range .}}
       <div class="artist-card">
@@ -28,15 +42,9 @@
       {{end}}
     </div>
     <div class="load-more-section">
-      <button id="loadMoreBtn" class="interactive-btn">Load More</button>
+      <button id="loadMoreBtn" class="interactive-btn">Load More</button>  
     </div>
   </main>
-  
-  <!-- Event Trigger Section -->
-  <section class="event-section">
-    <button id="eventBtn" class="interactive-btn">Trigger Event</button>
-    <p id="eventMessage" class="hidden message"></p>
-  </section>
   
   <footer>
     <p>&copy; 2025 Groupie Trackers | Made with 💙 for Music Lovers</p>

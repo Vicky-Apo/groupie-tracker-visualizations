@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"groupie-tracker/internal/data"
+	"groupie-tracker-search-bar/internal/data"
 	"html/template"
 	"log"
 	"net/http"

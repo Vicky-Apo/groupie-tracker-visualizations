@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"groupie-tracker/internal/data"
+	"groupie-tracker-search-bar/internal/data"
 )
 
 // DetailHandler handles the "/artist/{name}" route
