@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -62,7 +61,7 @@
                 <div id="locations-list" style="display: none;">
                     <ul>
                         {{range .Locations}}
-                            <li>{{.}}</li>
+                            <li>{{ formatLocation . }}</li>
                         {{else}}
                             <li>No locations found</li>
                         {{end}}
@@ -97,7 +96,7 @@
                     {{if .DatesLocMap}}
                         {{range $location, $dates := .DatesLocMap}}
                             <div class="date-card">
-                                <h4>{{$location}}</h4>
+                                <h4>{{ formatLocation $location }}</h4>
                                 <ul>
                                     {{range $dates}}
                                         <li>{{.}}</li>

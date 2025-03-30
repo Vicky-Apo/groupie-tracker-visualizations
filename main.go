@@ -20,13 +20,18 @@ func main() {
 
 	// Define custom template functions.
 	funcMap := template.FuncMap{
-		"replaceSpaces": utils.ReplaceSpaces,
-		"cleanDate":     utils.CleanDate,
+		"replaceSpaces":  utils.ReplaceSpaces,
+		"cleanDate":      utils.CleanDate,
+		"formatLocation": utils.FormatLocation,
 	}
 
 	// Parse all templates.
 	tmplPattern := filepath.Join("templates", "*.html")
-	tpl := template.Must(template.New("").Funcs(funcMap).ParseGlob(tmplPattern))
+	tpl := template.New("").Funcs(funcMap)
+	tpl, err := tpl.ParseGlob(tmplPattern)
+	if err != nil {
+		log.Fatalf("Error parsing templates: %v", err)
+	}
 
 	// Initialize the router from the routes package.
 	mux := routes.NewRouter(tpl)
