@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"groupie-tracker-search-bar/internal/data"
+	"groupie-tracker-search-bar/internal/utils"
 )
 
 type SearchResult struct {
@@ -26,87 +27,139 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	var results []SearchResult
 	seen := make(map[string]bool)
 
-	for _, a := range data.AllArtists {
-		// Artist/Band Name
-		if strings.Contains(strings.ToLower(a.Name), query) {
-			key := a.Name + "_artist"
+	// Match by artist, members, dates
+	for _, artist := range data.AllArtists {
+		// Artist name
+		if strings.HasPrefix(strings.ToLower(artist.Name), query) {
+			key := artist.Name + "_Artist"
 			if !seen[key] {
 				results = append(results, SearchResult{
-					Value:  a.Name + " — artist/band",
+					Value:  artist.Name + " — Artist/Band",
 					Type:   "artist/band",
-					Artist: a.Name,
-					ID:     a.ID,
+					Artist: artist.Name,
+					ID:     artist.ID,
 				})
 				seen[key] = true
 			}
 		}
 
 		// Members
-		for _, m := range a.Members {
-			if strings.Contains(strings.ToLower(m), query) {
-				key := m + "_member"
+		for _, member := range artist.Members {
+			if strings.HasPrefix(strings.ToLower(member), query) {
+				key := member + "_Member"
 				if !seen[key] {
 					results = append(results, SearchResult{
-						Value:  m + " — member",
+						Value:  member + " — Member",
 						Type:   "member",
-						Artist: a.Name,
-						ID:     a.ID,
+						Artist: artist.Name,
+						ID:     artist.ID,
 					})
 					seen[key] = true
 				}
+				// Also add band
+				bandKey := artist.Name + "_Artist"
+				if !seen[bandKey] {
+					results = append(results, SearchResult{
+						Value:  artist.Name + " — Artist/Band",
+						Type:   "artist/band",
+						Artist: artist.Name,
+						ID:     artist.ID,
+					})
+					seen[bandKey] = true
+				}
 			}
 		}
 
-		// First Album Date
-		if strings.Contains(strings.ToLower(a.FirstAlbum), query) {
-			key := a.FirstAlbum + "_firstalbum"
+		// Creation date
+		creationStr := strconv.Itoa(artist.CreationDate)
+		if strings.HasPrefix(creationStr, query) {
+			key := creationStr + "_Creation"
 			if !seen[key] {
 				results = append(results, SearchResult{
-					Value:  a.FirstAlbum + " — first album date",
-					Type:   "first album date",
-					Artist: a.Name,
-					ID:     a.ID,
-				})
-				seen[key] = true
-			}
-		}
-
-		// Creation Date
-		creationStr := strconv.Itoa(a.CreationDate)
-		if strings.Contains(creationStr, query) {
-			key := creationStr + "_creation"
-			if !seen[key] {
-				results = append(results, SearchResult{
-					Value:  creationStr + " — creation date",
+					Value:  creationStr + " — Creation Date",
 					Type:   "creation date",
-					Artist: a.Name,
-					ID:     a.ID,
+					Artist: artist.Name,
+					ID:     artist.ID,
 				})
 				seen[key] = true
 			}
+			artistKey := artist.Name + "_Artist_Creation"
+			if !seen[artistKey] {
+				results = append(results, SearchResult{
+					Value:  artist.Name + " — Artist/Band",
+					Type:   "artist/band",
+					Artist: artist.Name,
+					ID:     artist.ID,
+				})
+				seen[artistKey] = true
+			}
 		}
 
-		// Location (using RelationIndex)
-		for _, rel := range data.AllRelations.Index {
-			if rel.ID == a.ID {
-				for location := range rel.DatesLocations {
-					if strings.Contains(strings.ToLower(location), query) {
-						key := location + "_location"
-						if !seen[key] {
-							results = append(results, SearchResult{
-								Value:  location + " — location",
-								Type:   "location",
-								Artist: a.Name,
-								ID:     a.ID,
-							})
-							seen[key] = true
-						}
+		// First album date (exact match, can be mid-string)
+		if strings.Contains(strings.ToLower(artist.FirstAlbum), query) {
+			key := artist.FirstAlbum + "_First_Album"
+			if !seen[key] {
+				results = append(results, SearchResult{
+					Value:  artist.FirstAlbum + " — First Album Date",
+					Type:   "first album date",
+					Artist: artist.Name,
+					ID:     artist.ID,
+				})
+				seen[key] = true
+			}
+			artistKey := artist.Name + "_Artist_FirstAlbum"
+			if !seen[artistKey] {
+				results = append(results, SearchResult{
+					Value:  artist.Name + " — Artist/Band",
+					Type:   "artist/band",
+					Artist: artist.Name,
+					ID:     artist.ID,
+				})
+				seen[artistKey] = true
+			}
+		}
+	}
+
+	// Match by location (outside artist loop)
+	for _, rel := range data.AllRelations.Index {
+		for location := range rel.DatesLocations {
+			if len(query) >= 3 && strings.Contains(strings.ToLower(location), query) {
+				locKey := location + "_Location"
+				artist := findArtistByID(rel.ID)
+				if artist != nil {
+					if !seen[locKey] {
+						results = append(results, SearchResult{
+							Value:  utils.FormatLocation(location) + " — Location",
+							Type:   "location",
+							Artist: artist.Name,
+							ID:     artist.ID,
+						})
+						seen[locKey] = true
+					}
+
+					artistKey := artist.Name + "_Artist_Location"
+					if !seen[artistKey] {
+						results = append(results, SearchResult{
+							Value:  artist.Name + " — Artist/Band",
+							Type:   "artist/band",
+							Artist: artist.Name,
+							ID:     artist.ID,
+						})
+						seen[artistKey] = true
 					}
 				}
-				break
 			}
 		}
 	}
 
 	json.NewEncoder(w).Encode(results)
+}
+
+func findArtistByID(id int) *data.Artist {
+	for _, artist := range data.AllArtists {
+		if artist.ID == id {
+			return &artist
+		}
+	}
+	return nil
 }

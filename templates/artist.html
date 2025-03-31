@@ -44,9 +44,9 @@
                 <div id="members-list" style="display: none;">
                     <ul>
                         {{range .Artist.Members}}
-                            <li class="member-tag">{{.}}</li>
+                            <li class="member-tag">👤 {{.}}</li>
                         {{else}}
-                            <li>No members listed</li>
+                            <li>👤 No members listed</li>
                         {{end}}
                     </ul>
                 </div>
@@ -61,9 +61,9 @@
                 <div id="locations-list" style="display: none;">
                     <ul>
                         {{range .Locations}}
-                            <li>{{ formatLocation . }}</li>
+                            <li>📍 {{ formatLocation . }}</li>
                         {{else}}
-                            <li>No locations found</li>
+                            <li>📍 No locations found</li>
                         {{end}}
                     </ul>
                 </div>
@@ -78,9 +78,9 @@
                 <div id="dates-list" style="display: none;">
                     <ul>
                         {{range .Dates}}
-                            <li class="date-card">{{ cleanDate . }}</li>
+                            <li class="date-card">📆 {{ cleanDate . }}</li>
                         {{else}}
-                            <li>No dates available</li>
+                            <li>📆 No dates available</li>
                         {{end}}
                     </ul>
                 </div>
@@ -96,12 +96,12 @@
                     {{if .DatesLocMap}}
                         {{range $location, $dates := .DatesLocMap}}
                             <div class="date-card">
-                                <h4>{{ formatLocation $location }}</h4>
+                                <h4>📍 {{ formatLocation $location }}</h4>
                                 <ul>
                                     {{range $dates}}
-                                        <li>{{.}}</li>
+                                        <li>📆 {{.}}</li>
                                     {{else}}
-                                        <li>No dates for this location</li>
+                                        <li>📆 No dates for this location</li>
                                     {{end}}
                                 </ul>
                             </div>
@@ -116,7 +116,7 @@
         <p><a href="/" class="return-btn">Return to Home</a></p>
     </main>
     <footer>
-        <p>&copy; 2025 Groupie Trackers</p>
+        <p>&copy; 2025 Groupie Tracker 🖤 Zone01 </p>
     </footer>
     <script src="/static/js/app.js"></script>
 </body>

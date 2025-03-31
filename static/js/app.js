@@ -1,3 +1,14 @@
+//search bar suggestions format improvement
+function formatSuggestion(value) {
+    const [rawText, type] = value.split(" — ");
+    const formattedText = rawText
+        .replace(/-/g, " ") // turn dashes into spaces
+        .split(" ")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // capitalize
+        .join(" ");
+    return `${formattedText} — ${type}`;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     let offset = 10;
     const limit = 10;
@@ -51,10 +62,10 @@ if (restoreOffset > 10) {
             const query = searchInput.value.trim().toLowerCase();
             const filter = searchFilter.value;
 
-            if (query.length < 2) {
+            if (query === "") {
                 suggestionsBox.innerHTML = "";
                 return;
-            }
+              }
 
             fetch(`/search?query=${encodeURIComponent(query)}&filter=${filter}`)
                 .then((res) => res.json())
@@ -71,9 +82,20 @@ if (restoreOffset > 10) {
 
                     data.forEach((result) => {
                         const li = document.createElement("li");
-                        li.textContent = result.Value;
+                        const formatted = formatSuggestion(result.Value);
+                        const regex = new RegExp(`(${query})`, "ig");
+                        li.innerHTML = formatted.replace(regex, "<b>$1</b>");
                         li.className = "suggestion-item";
-                        li.onclick = () => {
+                        const iconMap = {
+                            "artist/band": "🎤",
+                            "member": "👤",
+                            "location": "📍",
+                            "first album date": "💿",
+                            "creation date": "📅"
+                          };
+                          const icon = iconMap[result.Type] || "❓";
+                          li.innerHTML = `${icon} ${formatSuggestion(result.Value)}`;                          
+                          li.onclick = () => {
                             window.location.href = `/artist/${result.Artist.replace(/\s+/g, "-")}`;
                         };
                         suggestionsBox.appendChild(li);

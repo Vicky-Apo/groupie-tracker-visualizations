@@ -20,7 +20,11 @@ func FormatLocation(s string) string {
 		if knownAbbreviations[upper] {
 			words[i] = upper
 		} else {
-			words[i] = strings.ToUpper(string(word[0])) + strings.ToLower(word[1:])
+			if len(word) > 1 {
+				words[i] = strings.ToUpper(string(word[0])) + strings.ToLower(word[1:])
+			} else {
+				words[i] = strings.ToUpper(word)
+			}
 		}
 	}
 	return strings.Join(words, " ")
