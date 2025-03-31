@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"html/template"
 	"log"
-
 	"net/http"
 	"path/filepath"
 
-	"groupie-tracker-search-bar/internal/data"
-	"groupie-tracker-search-bar/internal/routes"
-	"groupie-tracker-search-bar/internal/utils"
+	"groupie-tracker/internal/data"
+	"groupie-tracker/internal/routes"
+	"groupie-tracker/internal/utils"
 )
 
 func main() {

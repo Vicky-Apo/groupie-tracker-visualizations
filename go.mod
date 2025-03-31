@@ -1,3 +1,3 @@
-module groupie-tracker-search-bar
+module groupie-tracker
 
 go 1.22.2

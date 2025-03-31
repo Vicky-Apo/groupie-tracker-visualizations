@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"groupie-tracker-search-bar/internal/data"
-	"groupie-tracker-search-bar/internal/utils"
+	"groupie-tracker/internal/data"
+	"groupie-tracker/internal/utils"
 )
 
 type SearchResult struct {

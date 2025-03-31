@@ -4,7 +4,7 @@ import (
 	"html/template"
 	"net/http"
 
-	"groupie-tracker-search-bar/internal/handlers"
+	"groupie-tracker/internal/handlers"
 )
 
 // NewRouter sets up the mux with all the necessary routes.
