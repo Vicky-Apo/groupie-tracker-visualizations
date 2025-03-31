@@ -17,30 +17,26 @@
   
   <main>
     <div class="search-bar-container">
-        <input type="text" id="searchInput" placeholder="Search..." autocomplete="on">
-      </div>
-      <ul id="suggestions" class="suggestion-box"></ul>
-    </div>      
+      <input type="text" id="searchInput" placeholder="Search..." autocomplete="off">
+      <ul id="suggestions" class="suggestion-list"></ul>
+    </div>
+    
     <div class="artist-container" id="artistList">
       {{range .}}
-      <div class="artist-card">
-        <!-- Using a template function (replaceSpaces) to convert spaces to dashes -->
-        <a href="/artist/{{.Name | replaceSpaces}}">
-          <img src="{{.Image}}" alt="{{.Name}}" class="artist-img" />
-          <h3>{{.Name}}</h3>
-        </a>
-      </div>
+        <div class="artist-card">
+          <a href="/artist/{{.Name | replaceSpaces}}">
+            <img src="{{.Image}}" alt="{{.Name}}" class="artist-img" />
+            <h3>{{.Name}}</h3>
+          </a>
+        </div>
       {{end}}
     </div>
-    <div class="load-more-section">
-      <button id="loadMoreBtn" class="interactive-btn">Load More</button>  
-    </div>
   </main>
-  
+
   <footer>
     <p>&copy; 2025 Groupie Tracker 🖤 Zone01 </p>
   </footer>
-  
+
   <script src="/static/js/app.js"></script>
 </body>
 </html>

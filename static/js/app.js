@@ -57,17 +57,17 @@ if (restoreOffset > 10) {
 }
 
 
-    if (searchInput && suggestionsBox && searchFilter) {
+    if (searchInput && suggestionsBox) {
         searchInput.addEventListener("input", () => {
             const query = searchInput.value.trim().toLowerCase();
-            const filter = searchFilter.value;
+            
 
             if (query === "") {
                 suggestionsBox.innerHTML = "";
                 return;
               }
 
-            fetch(`/search?query=${encodeURIComponent(query)}&filter=${filter}`)
+            fetch(`/search?query=${encodeURIComponent(query)}`)
                 .then((res) => res.json())
                 .then((data) => {
                     suggestionsBox.innerHTML = "";
