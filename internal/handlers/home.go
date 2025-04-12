@@ -3,16 +3,15 @@ package handlers
 import (
 	"encoding/json"
 	"groupie-tracker/internal/data"
+	"groupie-tracker/internal/utils"
 	"html/template"
 	"log"
 	"net/http"
-	"sort"
 	"strconv"
-	"strings"
 )
 
-// HomeHandler handles the "/" route and renders the home page.
-func HomeHandler(tpl *template.Template) http.HandlerFunc {
+// IntroHandler handles the "/" route and renders the intro page.
+func IntroHandler(tpl *template.Template) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -24,30 +23,34 @@ func HomeHandler(tpl *template.Template) http.HandlerFunc {
 			return
 		}
 
+		err := tpl.ExecuteTemplate(w, "intro.html", nil)
+		if err != nil {
+			log.Println("ERROR rendering template:", err)
+			http.Error(w, "Internal Server Error while rendering index", http.StatusInternalServerError)
+		}
+	}
+}
+
+// HomeHandler handles the "/home" route and renders the home page.
+func HomeHandler(tpl *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+			return
+		}
+
+		if r.URL.Path != "/home" {
+			handler404(tpl, w)
+			return
+		}
+
 		if len(data.AllArtists) == 0 {
 			log.Println("ERROR: No artist data available")
 			http.Error(w, "No artist data available", http.StatusInternalServerError)
 			return
 		}
 
-		// Sort artists by name, case insensitive.
-		sortedArtists := make([]data.Artist, len(data.AllArtists))
-		copy(sortedArtists, data.AllArtists)
-		sort.Slice(sortedArtists, func(i, j int) bool {
-			return strings.ToLower(sortedArtists[i].Name) < strings.ToLower(sortedArtists[j].Name)
-		})
-
-		// Only pass the initial 10 artists.
-		initialCount := 10
-		var initialArtists []data.Artist
-		if len(sortedArtists) > initialCount {
-			initialArtists = sortedArtists[:initialCount]
-		} else {
-			initialArtists = sortedArtists
-		}
-
-		// Render the homepage template with initialArtists.
-		err := tpl.ExecuteTemplate(w, "home.html", initialArtists)
+		err := tpl.ExecuteTemplate(w, "home.html", nil)
 		if err != nil {
 			log.Println("ERROR rendering template:", err)
 			http.Error(w, "Internal Server Error while rendering index", http.StatusInternalServerError)
@@ -74,11 +77,7 @@ func GetArtists(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Sort artists by name, case insensitive.
-	sortedArtists := make([]data.Artist, len(data.AllArtists))
-	copy(sortedArtists, data.AllArtists)
-	sort.Slice(sortedArtists, func(i, j int) bool {
-		return strings.ToLower(sortedArtists[i].Name) < strings.ToLower(sortedArtists[j].Name)
-	})
+	sortedArtists := utils.SortingArtists(data.AllArtists)
 
 	// Default values.
 	offset := 0
@@ -111,7 +110,13 @@ func GetArtists(w http.ResponseWriter, r *http.Request) {
 	}
 
 	paginatedArtists := sortedArtists[offset:end]
-	err := json.NewEncoder(w).Encode(paginatedArtists)
+
+	response := map[string]interface{}{
+		"artists": paginatedArtists,
+		"total":   len(sortedArtists),
+	}
+
+	err := json.NewEncoder(w).Encode(response)
 	if err != nil {
 		log.Println("ERROR encoding JSON:", err)
 		http.Error(w, "Internal Server Error while encoding JSON", http.StatusInternalServerError)

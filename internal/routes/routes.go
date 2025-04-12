@@ -11,16 +11,23 @@ import (
 func NewRouter(tpl *template.Template) *http.ServeMux {
 	mux := http.NewServeMux()
 
-	// Home route with exact path checking.
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		handlers.HomeHandler(tpl)(w, r)
-	})
+	// First welcome page route
+	mux.HandleFunc("/", handlers.IntroHandler(tpl))
+
+	// HomePage route
+	mux.HandleFunc("/home", handlers.HomeHandler(tpl))
 
 	// Artist detail route.
 	mux.HandleFunc("/artist/", handlers.DetailHandler(tpl))
 
 	// API Route for fetching artists
 	mux.HandleFunc("/api/artists", handlers.GetArtists)
+
+	// API Route for fetching all locations for filters
+	mux.HandleFunc("/api/all-locations", handlers.GetAllLocations)
+
+	// API Route for fetching filtered results
+	mux.HandleFunc("/api/filters", handlers.FiltersResultHandler())
 
 	//Search handler
 	mux.HandleFunc("/search", handlers.SearchHandler)
