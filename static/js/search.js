@@ -38,9 +38,14 @@ document.addEventListener("DOMContentLoaded", () => {
             li.setAttribute("data-index", index);
   
             li.onclick = () => {
-              window.location.href = `/artist/${result.Artist.replace(/\s+/g, "-")}`;
+              if (result.Type === "artist/band" || result.Type === "member") {
+                window.location.href = `/artist/${result.Artist.replace(/\s+/g, "-")}`;
+              } else {
+                // Use the part before the " — " as the query.
+                const queryParam = result.Value.split(" — ")[0];
+                window.location.href = `/results?query=${encodeURIComponent(queryParam)}`;
+              }
             };
-  
             suggestionsBox.appendChild(li);
           });
         });
@@ -62,11 +67,23 @@ document.addEventListener("DOMContentLoaded", () => {
         updateActiveSuggestion(items);
       }
   
-      if (e.key === "Enter" && activeSuggestionIndex !== -1) {
+      if (e.key === "Enter") {
         e.preventDefault();
-        const result = currentSuggestions[activeSuggestionIndex];
-        if (result) {
-          window.location.href = `/artist/${result.Artist.replace(/\s+/g, "-")}`;
+        if (activeSuggestionIndex !== -1) {
+          const result = currentSuggestions[activeSuggestionIndex];
+          if (result) {
+            if (result.Type === "artist/band" || result.Type === "member") {
+              window.location.href = `/artist/${result.Artist.replace(/\s+/g, "-")}`;
+            } else {
+              const queryParam = result.Value.split(" — ")[0];
+              window.location.href = `/results?query=${encodeURIComponent(queryParam)}`;
+            }
+          }
+        } else {
+          const query = searchInput.value.trim();
+          if (query !== "") {
+            window.location.href = `/results?query=${encodeURIComponent(query)}`;
+          }
         }
       }
     });

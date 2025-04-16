@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentPage = savedPage ? parseInt(savedPage) : 1;
   }
 
-  if (document.getElementById("artistList")) {
+  if (document.body.classList.contains("home-page")) {
     fetchArtists(currentPage);
   }
 

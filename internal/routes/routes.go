@@ -32,6 +32,9 @@ func NewRouter(tpl *template.Template) *http.ServeMux {
 	//Search handler
 	mux.HandleFunc("/search", handlers.SearchHandler)
 
+	// Results page handler
+	mux.HandleFunc("/results", handlers.ResultsPageHandler)
+
 	// About page section
 	mux.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
 		tpl.ExecuteTemplate(w, "about.html", nil)
